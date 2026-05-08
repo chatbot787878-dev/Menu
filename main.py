@@ -10,8 +10,10 @@ from telegram.ext import (
 
 from io import BytesIO
 
-TOKEN = "8282514486:AAH5OigcWF9C6_pkpuByU9hZU8BFsOjUlvY"
 
+import os
+
+TOKEN = os.getenv("TOKEN")
 menus = {}
 
 approved_users = set()
