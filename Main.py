@@ -1,3 +1,4 @@
+print("MAIN.PY STARTED")
 from telegram import Update, InputFile
 from telegram.ext import (
 ApplicationBuilder,
