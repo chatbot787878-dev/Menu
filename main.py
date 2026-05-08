@@ -1,11 +1,11 @@
 print("MAIN.PY STARTED")
 from telegram import Update, InputFile
 from telegram.ext import (
-ApplicationBuilder,
-CommandHandler,
-MessageHandler,
-filters,
-ContextTypes
+    ApplicationBuilder,
+    CommandHandler,
+    MessageHandler,
+    filters,
+    ContextTypes
 )
 
 from io import BytesIO
@@ -19,18 +19,18 @@ approved_users = set()
 ADMIN_USERNAME = "naodtesfaye"
 ADMIN_ID = 5789277048
 
-=========================
-BEAUTIFUL UI + AR MENU
-=========================
+# =========================
+# BEAUTIFUL UI + AR MENU
+# =========================
 
 def generate_html(name, items):
 
-items_html = ""
-cards_js = ""
+    items_html = ""
+    cards_js = ""
 
-for i, item in enumerate(items):
+    for i, item in enumerate(items):
 
-items_html += f"""
+        items_html += f"""
 <div class="card" onclick="showModel({i})">
 
 <div class="image-wrap">
@@ -53,7 +53,7 @@ items_html += f"""
 </div>
 """
 
-cards_js += f"""
+        cards_js += f"""
 if(index === {i}) {{
 
 viewer.src = "{item['glb']}";
@@ -63,7 +63,7 @@ price.innerText = "{item['price']}";
 }}
 """
 
-return f"""
+    return f"""
 <!DOCTYPE html>
 <html>
 
@@ -73,7 +73,7 @@ return f"""
 
 <meta
 name="viewport"
-content="width=device-width, initial-scale=1.0"
+content="width=device-width, initial-scale=1.0">
 
 <title>{name} AR Menu</title>
 
@@ -84,7 +84,7 @@ src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
 
 <style>
 
-• {{
+* {{
 margin: 0;
 padding: 0;
 box-sizing: border-box;
@@ -471,264 +471,254 @@ closeModal();
 </html>
 """
 
-=========================
-START
-=========================
+# =========================
+# START
+# =========================
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-await update.message.reply_text(
+    await update.message.reply_text(
 
-"🍽️ 3D AR MENU BUILDER\n\n"
+        "🍽️ 3D AR MENU BUILDER\n\n"
 
-"/setup RestaurantName\n\n"
+        "/setup RestaurantName\n\n"
 
-"Then send food photo with:\n\n"
+        "Then send food photo with:\n\n"
 
-"Name | Price | GLB Link\n\n"
+        "Name | Price | GLB Link\n\n"
 
-"/create"
-)
+        "/create"
+    )
 
-=========================
-SETUP
-=========================
+# =========================
+# SETUP
+# =========================
 
 async def setup(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-user_id = update.effective_user.id
+    user_id = update.effective_user.id
 
-if not context.args:
+    if not context.args:
 
-await update.message.reply_text(
-"Usage:\n/setup RestaurantName"
-)
+        await update.message.reply_text(
+            "Usage:\n/setup RestaurantName"
+        )
 
-return
+        return
 
-restaurant_name = " ".join(context.args)
+    restaurant_name = " ".join(context.args)
 
-menus[user_id] = {
+    menus[user_id] = {
 
-"name": restaurant_name,
-"items": []
-}
+        "name": restaurant_name,
+        "items": []
+    }
 
-await update.message.reply_text(
+    await update.message.reply_text(
 
-f"✅ {restaurant_name} created!\n\n"
+        f"✅ {restaurant_name} created!\n\n"
 
-"Now send food items."
-)
+        "Now send food items."
+    )
 
-=========================
-PHOTO HANDLER
-=========================
+# =========================
+# PHOTO HANDLER
+# =========================
 
 async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-user_id = update.effective_user.id
+    user_id = update.effective_user.id
 
-if user_id not in menus:
+    if user_id not in menus:
 
-await update.message.reply_text(
-"Use /setup first"
-)
+        await update.message.reply_text(
+            "Use /setup first"
+        )
 
-return
+        return
 
-caption = update.message.caption
+    caption = update.message.caption
 
-if not caption or "|" not in caption:
+    if not caption or "|" not in caption:
 
-await update.message.reply_text(
+        await update.message.reply_text(
 
-"Format:\n\n"
+            "Format:\n\n"
 
-"Burger | 250 ETB | GLB_LINK"
-)
+            "Burger | 250 ETB | GLB_LINK"
+        )
 
-return
+        return
 
-parts = [p.strip() for p in caption.split("|")]
+    parts = [p.strip() for p in caption.split("|")]
 
-if len(parts) != 3:
+    if len(parts) != 3:
 
-await update.message.reply_text(
-"Need exactly 3 parts"
-)
+        await update.message.reply_text(
+            "Need exactly 3 parts"
+        )
 
-return
+        return
 
-photo = await update.message.photo[-1].get_file()
+    photo = await update.message.photo[-1].get_file()
 
-menus[user_id]["items"].append({
+    menus[user_id]["items"].append({
 
-"name": parts[0],
-"price": parts[1],
-"glb": parts[2],
-"image": photo.file_path
-})
+        "name": parts[0],
+        "price": parts[1],
+        "glb": parts[2],
+        "image": photo.file_path
+    })
 
-await update.message.reply_text(
-f"✅ {parts[0]} added"
-)
-=========================
-APPROVE USER
-=========================
+    await update.message.reply_text(
+        f"✅ {parts[0]} added"
+    )
+
+# =========================
+# APPROVE USER
+# =========================
 
 async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-if update.effective_user.id != ADMIN_ID:
+    if update.effective_user.id != ADMIN_ID:
 
-await update.message.reply_text(
-"Unauthorized"
-)
+        await update.message.reply_text(
+            "Unauthorized"
+        )
 
-return
+        return
 
-if len(context.args) == 0:
+    if len(context.args) == 0:
 
-await update.message.reply_text(
-"Usage:\n/approve USER_ID"
-)
+        await update.message.reply_text(
+            "Usage:\n/approve USER_ID"
+        )
 
-return
+        return
 
-try:
+    try:
 
-user_id = int(context.args[0])
+        user_id = int(context.args[0])
 
-approved_users.add(user_id)
+        approved_users.add(user_id)
 
-await update.message.reply_text(
-f"✅ Approved {user_id}"
-)
+        await update.message.reply_text(
+            f"✅ Approved {user_id}"
+        )
 
-try:
+        try:
 
-await context.bot.send_message(
-chat_id=user_id,
-text=(
-"✅ Payment confirmed!\n\n"
-"Now send /create again "
-"to receive your AR menu."
-)
-)
+            await context.bot.send_message(
+                chat_id=user_id,
+                text=(
+                    "✅ Payment confirmed!\n\n"
+                    "Now send /create again "
+                    "to receive your AR menu."
+                )
+            )
 
-except:
-pass
+        except:
+            pass
 
-except:
+    except:
 
-await update.message.reply_text(
-"Invalid USER_ID"
-)
+        await update.message.reply_text(
+            "Invalid USER_ID"
+        )
 
-=========================
-CREATE HTML FILE
-=========================
+# =========================
+# CREATE HTML FILE
+# =========================
 
 async def create(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-user_id = update.effective_user.id
+    user_id = update.effective_user.id
 
-# PAYMENT CHECK
-if user_id not in approved_users:
+    # PAYMENT CHECK
+    if user_id not in approved_users:
 
-await update.message.reply_text(
+        await update.message.reply_text(
 
-f"⚠️ Final Step Required\n\n"
+            f"⚠️ Final Step Required\n\n"
 
-f"To receive your AR menu:\n"
-f"Contact admin and complete payment.\n\n"
+            f"To receive your AR menu:\n"
+            f"Contact admin and complete payment.\n\n"
 
-f"Your User ID:\n{user_id}\n\n"
+            f"Your User ID:\n{user_id}\n\n"
 
-f"Contact Admin:\n"
-f"https://t.me/{ADMIN_USERNAME}"
-)
+            f"Contact Admin:\n"
+            f"https://t.me/{ADMIN_USERNAME}"
+        )
 
-return
+        return
 
-if (
-user_id not in menus
-or
-not menus[user_id]["items"]
-):
+    if (
+        user_id not in menus
+        or
+        not menus[user_id]["items"]
+    ):
 
-await update.message.reply_text(
-"Add items first!"
-)
+        await update.message.reply_text(
+            "Add items first!"
+        )
 
-return
-if (
-user_id not in menus
-or
-not menus[user_id]["items"]
-):
+        return
 
-await update.message.reply_text(
-"Add items first!"
-)
+    await update.message.reply_text(
+        "⚙️ Creating beautiful AR menu..."
+    )
 
-return
+    menu = menus[user_id]
 
-await update.message.reply_text(
-"⚙️ Creating beautiful AR menu..."
-)
+    html = generate_html(
+        menu["name"],
+        menu["items"]
+    )
 
-menu = menus[user_id]
+    file = BytesIO(html.encode())
 
-html = generate_html(
-menu["name"],
-menu["items"]
-)
+    file.name = "menu.html"
 
-file = BytesIO(html.encode())
+    await update.message.reply_document(
 
-file.name = "menu.html"
+        document=InputFile(file),
 
-await update.message.reply_document(
+        filename="menu.html",
 
-document=InputFile(file),
+        caption=(
+            "✅ Your AR Menu is ready!\n\n"
+            "Open menu.html in Chrome\n"
+            "Tap 'View On Your Table'"
+        )
+    )
 
-filename="menu.html",
-
-caption=(
-"✅ Your AR Menu is ready!\n\n"
-"Open menu.html in Chrome\n"
-"Tap 'View On Your Table'"
-)
-)
-
-=========================
-RUN BOT
-=========================
+# =========================
+# RUN BOT
+# =========================
 
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(
-CommandHandler("start", start)
+    CommandHandler("start", start)
 )
 
 app.add_handler(
-CommandHandler("setup", setup)
+    CommandHandler("setup", setup)
 )
 
 app.add_handler(
-CommandHandler("create", create)
+    CommandHandler("create", create)
 )
 
 app.add_handler(
-MessageHandler(
-filters.PHOTO,
-photo_handler
-)
+    MessageHandler(
+        filters.PHOTO,
+        photo_handler
+    )
 )
 app.add_handler(
-CommandHandler("approve", approve)
+    CommandHandler("approve", approve)
 )
 print("🍽️ AR MENU BOT RUNNING...")
 
-app.run_polling(
+app.run_polling()
